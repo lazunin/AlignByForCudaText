@@ -1,0 +1,12 @@
+[info]
+title=AlignBy
+desc=Some description
+type=cudatext-plugin
+subdir=cuda_align_by
+homepage=
+
+[item2]
+section=commands
+caption=AlignBy
+method=run
+
