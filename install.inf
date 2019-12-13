@@ -10,3 +10,8 @@ section=commands
 caption=AlignBy
 method=run
 
+[item3]
+section=commands
+caption=AlignByDlg
+method=run_with_dlg
+

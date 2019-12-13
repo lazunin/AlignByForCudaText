@@ -35,14 +35,72 @@ class Command:
 		col1, row1, col2, row2  = ed.get_carets()[0]
 		if (row1, col1) > (row2, col2):
 			col1, row1, col2, row2 = col2, row2, col1, row1
-		if row2 < 0: return None
+		#if row2 < 0: return None
+		if any(x < 0 for x in (col1, row1, col2, row2)): return None
 		col1 = 0 # the entire first line, including possibly missing leading spaces
-		return col1, row1, col2, row2   
+		return col1, row1, col2, row2
 	
 	def run(self):
 		sel = self.get_selection()
+		if not sel: return
 		s   = ed.get_text_substr(*sel)
 		s   = align_by_symbol(s, '=')
 		ed.replace(*sel, s)
+	
+	def align_selection_by(self, delimeter):
+		sel = self.get_selection()
+		s   = ed.get_text_substr(*sel)
+		s   = align_by_symbol(s, delimeter)
+		ed.replace(*sel, s)
+	
+	def callback_maindlg(self, id_dlg, id_ctl, data='', info=''):
+		h = id_dlg
+		n_edit = dlg_proc(h, DLG_CTL_FIND, prop='edit_delimeter')
+		d = dlg_proc(h, DLG_CTL_PROP_GET, index=n_edit)
+		delimeter = d['val']
+		self.align_selection_by(delimeter)
+	
+	def run_with_dlg(self):
+		h=dlg_proc(0, DLG_CREATE)
+		dlg_proc(h, DLG_PROP_SET, prop={
+			'cap'     : 'Align by',
+			'x'       : 100,
+			'y'       : 50,
+			'w'       : 220,
+			'h'       : 100,
+			'w_min'   : 200,
+			'h_min'   : 100,
+			'border'  : DBORDER_SIZE,
+			'topmost' : True,
+			})
 		
-
+		n=dlg_proc(h, DLG_CTL_ADD, 'label')
+		dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+			'name' : 'label0',
+			'cap'  : 'Delimeter: ',
+			'x'    : 10,
+			'y'    : 10,
+			'w'    : 50,
+			'tag'  : 'some_tag',
+			})
+		
+		n=dlg_proc(h, DLG_CTL_ADD, 'edit')
+		dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+			'name' : 'edit_delimeter',
+			'val'  :'',
+			'x'    : 10,
+			'y'    : 30,
+			'w'    : 200,
+			})
+		
+		n=dlg_proc(h, DLG_CTL_ADD, 'button')
+		dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+			'name'      : 'btn_align',
+			'cap'       : 'Align',
+			'x'         : 10,
+			'y'         : 60,
+			'w'         : 100,
+			'on_change' : 'cuda_align_by.callback_maindlg'
+			})
+		
+		dlg_proc(h, DLG_SHOW_NONMODAL)
