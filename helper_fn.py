@@ -8,6 +8,7 @@ def is_op(left, right, sep):
     '''
     Check if it was split inside a multi-character operator.
     '''
+    if len(left.strip()) == 0: return False
     return ((left[-1:] + sep) in multi) or ((left[-2:] + sep) in multi) or ((left[-1:] + sep + right[:1]) in multi) or ((sep + right[:1]) in multi) or ((sep + right[:2]) in multi)
     
     
