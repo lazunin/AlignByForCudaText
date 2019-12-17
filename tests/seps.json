@@ -1,0 +1,11 @@
+{
+  "seps": { "test_001_spaces.py": "=", 
+            "test_001_tabs.py": "=", 
+            "test_002_spaces.py": "=", 
+            "test_002_tabs.py": "=", 
+            "test_003_bracket_equal_spaces.py": "=", 
+            "test_003_bracket_equal_tabs.py": "=", 
+            "test_004_beginning_of_line_spaces.cpp": "//", 
+            "test_004_beginning_of_line_tabs.cpp": "//"
+          }
+}
