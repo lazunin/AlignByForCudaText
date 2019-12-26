@@ -36,7 +36,10 @@ def align_by_symbol(text, sep):
 	Modyfy text, so that first occurences of `sep`
 	are vertically aligned.
 	'''
-	lines        = text.splitlines(True)
+	if type(text) == list:
+		lines    = text
+	else:
+		lines    = text.splitlines(True)
 	lines        = [special_split(s, sep) for s in lines]
 	left_max_len = max([tabbed_length(s[0]) if len(s) == 2 else 0 for s in lines])
 	lines2       = []
@@ -46,4 +49,8 @@ def align_by_symbol(text, sep):
 		else:
 			result = line[0] + ' '*(left_max_len - tabbed_length(line[0])) + sep + line[1]
 		lines2.append(result)
-	return "".join(lines2)
+	if type(text) == list:
+		result = lines2
+	else:
+		result = ["".join(lines2)]
+	return result

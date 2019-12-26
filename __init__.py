@@ -27,31 +27,39 @@ class Command:
 		ini_write(fn_config, 'op', 'option_bool', bool_to_str(option_bool))
 		file_open(fn_config)
 	
-	def get_selection(self):
+	def get_selections(self):
 		'''
 		Selection (col1, row1, col2, row2), but col1 is set to 0,
 		so that the entire first line is selected.
 		'''
-		col1, row1, col2, row2  = ed.get_carets()[0]
-		if (row1, col1) > (row2, col2):
-			col1, row1, col2, row2 = col2, row2, col1, row1
-		#if row2 < 0: return None
-		if any(x < 0 for x in (col1, row1, col2, row2)): return None
-		col1 = 0 # the entire first line, including possibly missing leading spaces
-		return col1, row1, col2, row2
+		def sort_carets(carets):
+			col1, row1, col2, row2 = carets
+			if (row1, col1) > (row2, col2):
+				col1, row1, col2, row2 = col2, row2, col1, row1
+			return col1, row1, col2, row2
+		
+		carets = [sort_carets(cs) for cs in ed.get_carets()]
+
+		# if it's an "ordinary" selection, not column selection...
+		if len(carets) == 1:
+			col1, row1, col2, row2 = carets[0]
+			col1 = 0 # the entire first line, including possibly missing leading spaces
+			carets = [(col1, row1, col2, row2)]
+		return carets
 	
 	def run(self):
-		sel = self.get_selection()
-		if not sel: return
-		s   = ed.get_text_substr(*sel)
-		s   = align_by_symbol(s, '=')
-		ed.replace(*sel, s)
+		self.align_selection_by("=")
 	
 	def align_selection_by(self, delimeter):
-		sel = self.get_selection()
-		s   = ed.get_text_substr(*sel)
-		s   = align_by_symbol(s, delimeter)
-		ed.replace(*sel, s)
+		selections = self.get_selections()
+		substrings = [ed.get_text_substr(*sel) for sel in selections]
+		if len(substrings) == 1:
+			s = substrings[0]
+		else:
+			s = substrings
+		s = align_by_symbol(s, delimeter)
+		for sel, rep in zip(selections, s):
+			ed.replace(*sel, rep)
 	
 	def callback_maindlg(self, id_dlg, id_ctl, data='', info=''):
 		h = id_dlg
